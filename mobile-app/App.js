@@ -5,6 +5,17 @@ import { StyleSheet, Text, View } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
 import RootScreen from './navigation/RootScreen';
+import { Provider } from 'react-redux';
+import { applyMiddleware, combineReducers, createStore } from 'redux';
+import authReducer from './store/reducers/authReducer';
+import ReduxThunk from 'redux-thunk';
+import AppNavigator from './navigation/AppNavigator';
+
+const rootStore = combineReducers({
+  auth: authReducer,
+});
+
+const store = createStore(rootStore, applyMiddleware(ReduxThunk));
 
 const fetchFonts = () => {
   return Font.loadAsync({
@@ -29,8 +40,8 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <RootScreen />
-    </NavigationContainer>
+    <Provider store={store}>
+      <AppNavigator />
+    </Provider>
   );
 }

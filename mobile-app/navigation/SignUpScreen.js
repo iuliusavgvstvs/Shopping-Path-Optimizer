@@ -36,11 +36,16 @@ const SignUpScreen = ({ navigation }) => {
         value: '',
         isValid: false,
       },
+      confirmPassword: {
+        value: '',
+        isValid: false,
+      },
     },
     false
   );
 
   useEffect(() => {
+    console.log(formState);
     const password = formState.inputs.password.value;
     const confirmPassword = formState.inputs.confirmPassword.value;
     if (formState.isValid && password === confirmPassword) {

@@ -19,6 +19,8 @@ import * as Animatable from 'react-native-animatable';
 import Colors from '../constants/Colors';
 import Input from '../components/UI/Input';
 import MainButton from '../components/UI/MainButton';
+import { useDispatch } from 'react-redux';
+import * as authActions from '../store/actions/authActions';
 
 const LoginScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +42,17 @@ const LoginScreen = ({ navigation }) => {
 
   const signUpHandler = () => {
     navigation.navigate('SignupScreen');
+  };
+
+  const dispatch = useDispatch();
+
+  const logInHandler = async () => {
+    await dispatch(
+      authActions.login(
+        formState.inputs.email.value,
+        formState.inputs.password.value
+      )
+    );
   };
 
   const emailIcon = <Ionicons name="person-outline" size={24} color="black" />;
@@ -102,7 +115,7 @@ const LoginScreen = ({ navigation }) => {
                 style={styles.button}
                 text="Log in"
                 textStyle={[styles.buttonText, { color: '#fff' }]}
-                onClick={() => {}}
+                onClick={logInHandler}
               ></MainButton>
               <MainButton
                 onClick={signUpHandler}
