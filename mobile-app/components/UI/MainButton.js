@@ -7,6 +7,7 @@ const MainButton = (props) => {
   if (props.linearGradient) {
     return (
       <TouchableOpacity
+        disabled={props.disabled}
         onPress={props.onClick}
         style={props.style || styles.button}
       >
@@ -14,19 +15,18 @@ const MainButton = (props) => {
           colors={props.colors || [Colors.half_primary, Colors.primary]}
           style={props.style || styles.button}
         >
-          <Text style={props.textStyle || styles.text}>{props.text} </Text>
-          {props.children}
+          <Text style={props.textStyle || styles.text}>{props.children} </Text>
         </LinearGradient>
       </TouchableOpacity>
     );
   }
   return (
     <TouchableOpacity
+      disabled={props.disabled}
       onPress={props.onClick}
       style={props.style || styles.button}
     >
-      <Text style={props.textStyle || styles.text}>{props.text}</Text>
-      {props.children}
+      <Text style={props.textStyle || styles.text}>{props.children}</Text>
     </TouchableOpacity>
   );
 };

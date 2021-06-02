@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {
   VALIDATOR_EMAIL,
@@ -19,12 +21,10 @@ import * as Animatable from 'react-native-animatable';
 import Colors from '../constants/Colors';
 import Input from '../components/UI/Input';
 import MainButton from '../components/UI/MainButton';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import * as authActions from '../store/actions/authActions';
 
 const LoginScreen = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
   const [showPassword, setShowPassword] = useState(false);
   const [formState, inputHandler] = useForm(
     {
@@ -54,6 +54,15 @@ const LoginScreen = ({ navigation }) => {
       )
     );
   };
+
+  const error = useSelector((state) => state.auth.error);
+  const isLoading = useSelector((state) => state.auth.isLoading);
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('An Error Occured', error, [{ text: 'Okay' }]);
+    }
+  }, [error]);
 
   const emailIcon = <Ionicons name="person-outline" size={24} color="black" />;
   const emailIcon2 = formState.inputs.email.isValid && (
@@ -111,25 +120,49 @@ const LoginScreen = ({ navigation }) => {
 
             <View style={styles.buttonContainer}>
               <MainButton
+                disabled={isLoading}
                 linearGradient
+                colors={isLoading && ['#9c9c9c', '#9c9c9c']}
                 style={styles.button}
-                text="Log in"
                 textStyle={[styles.buttonText, { color: '#fff' }]}
                 onClick={logInHandler}
-              ></MainButton>
+              >
+                {!isLoading ? (
+                  'Log in'
+                ) : (
+                  <ActivityIndicator size="large" color={Colors.primary} />
+                )}
+              </MainButton>
               <MainButton
+                disabled={isLoading}
                 onClick={signUpHandler}
-                style={[
-                  styles.button,
-                  {
-                    borderColor: Colors.primary,
-                    borderWidth: 1,
-                    marginTop: 20,
-                  },
-                ]}
-                textStyle={[styles.buttonText, { color: Colors.primary }]}
-                text="Sign up"
-              ></MainButton>
+                style={
+                  isLoading
+                    ? [
+                        styles.button,
+                        {
+                          borderColor: '#9c9c9c',
+                          borderWidth: 1,
+                          marginTop: 20,
+                        },
+                      ]
+                    : [
+                        styles.button,
+                        {
+                          borderColor: Colors.primary,
+                          borderWidth: 1,
+                          marginTop: 20,
+                        },
+                      ]
+                }
+                textStyle={
+                  isLoading
+                    ? [styles.buttonText, { color: '#9c9c9c' }]
+                    : [styles.buttonText, { color: Colors.primary }]
+                }
+              >
+                Sign Up
+              </MainButton>
             </View>
           </ScrollView>
         </Animatable.View>

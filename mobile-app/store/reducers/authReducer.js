@@ -9,7 +9,7 @@ import {
 
 const initialState = {
   isLoading: false,
-  error: false,
+  error: null,
   token: null,
   userId: null,
   userEmail: null,
@@ -21,6 +21,10 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isLoading: true,
+        error: null,
+        token: null,
+        userId: null,
+        userEmail: null,
       };
     case LOGIN_SUCCEEDED:
       return {
@@ -29,6 +33,7 @@ export default (state = initialState, action) => {
         userId: action.payload.userId,
         userEmail: action.payload.userEmail,
         isLoading: false,
+        error: null,
       };
     case LOGIN_FAILED:
       return {
@@ -37,7 +42,7 @@ export default (state = initialState, action) => {
         token: null,
         userId: null,
         userEmail: null,
-        error: action.payload.error,
+        error: action.payload,
       };
     case SIGNUP_STARTED:
       return {

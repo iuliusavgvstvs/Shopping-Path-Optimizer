@@ -1,10 +1,6 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
-import RootScreen from './navigation/RootScreen';
 import { Provider } from 'react-redux';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import authReducer from './store/reducers/authReducer';

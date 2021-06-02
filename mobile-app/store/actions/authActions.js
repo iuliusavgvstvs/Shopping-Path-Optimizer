@@ -27,7 +27,10 @@ export const signup = (email, password) => {
       dispatch({ type: SIGNUP_SUCCEEDED, payload: response });
     } catch (error) {
       console.log('am primit eroare:', error);
-      dispatch({ type: SIGNUP_FAILED, payload: error });
+      console.log('error response aici', error.response);
+      if (error === 'Error: Request failed with status code 403')
+        console.log('da');
+      dispatch({ type: SIGNUP_FAILED, payload: error.message });
     }
   };
 };
@@ -46,8 +49,10 @@ export const login = (email, password) => {
       console.log('response data aici', responseData);
       dispatch({ type: LOGIN_SUCCEEDED, payload: responseData });
     } catch (error) {
-      console.log('am primit eroare:', error);
-      dispatch({ type: LOGIN_FAILED, payload: error });
+      let err = 'Log in failed. Please try again later.';
+      if (error.response.status === '403')
+        err = 'Invalid username or password. Please try again.';
+      dispatch({ type: LOGIN_FAILED, payload: err });
     }
   };
 };
