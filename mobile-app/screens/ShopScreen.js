@@ -27,7 +27,7 @@ const defaultScreenConfig = {
 
 const HomeStackNavigator = ({ navigation }) => (
   <homeStackScreen.Navigator mode="modal" headerMode="float">
-    <stackScreen.Screen
+    <homeStackScreen.Screen
       name="Home"
       component={HomeScreen}
       options={defaultScreenConfig}
@@ -37,7 +37,7 @@ const HomeStackNavigator = ({ navigation }) => (
 
 const ProductsStackNavigator = ({ navigation }) => (
   <productsStackScreen.Navigator mode="modal" headerMode="float">
-    <stackScreen.Screen
+    <productsStackScreen.Screen
       name="Products"
       component={ProductsScreen}
       options={defaultScreenConfig}
@@ -56,26 +56,32 @@ const DrawerNavigator = () => {
         },
       }}
     >
-      <Drawer.Screen
+      <drawerNavigator.Screen
         name="Home"
         component={HomeStackNavigator}
         options={{
           drawerIcon: (drawerConfig) => (
             <Ionicons
-              name={Platform.OS === 'android' ? 'md-list' : 'ios-list'}
+              name={
+                Platform.OS === 'android' ? 'home-outline' : 'ios-home-outline'
+              }
               size={23}
               color={drawerConfig.color}
             />
           ),
         }}
       />
-      <Drawer.Screen
+      <drawerNavigator.Screen
         name="Products"
         component={ProductsStackNavigator}
         options={{
           drawerIcon: (drawerConfig) => (
             <Ionicons
-              name={Platform.OS === 'android' ? 'md-cart' : 'ios-cart'}
+              name={
+                Platform.OS === 'android'
+                  ? 'search-outline'
+                  : 'ios-search-outline'
+              }
               size={23}
               color={drawerConfig.color}
             />

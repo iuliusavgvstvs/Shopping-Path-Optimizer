@@ -7,6 +7,7 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {
   VALIDATOR_EMAIL,
@@ -19,10 +20,10 @@ import * as Animatable from 'react-native-animatable';
 import Colors from '../constants/Colors';
 import Input from '../components/UI/Input';
 import MainButton from '../components/UI/MainButton';
+import { useDispatch, useSelector } from 'react-redux';
+import * as authActions from '../store/actions/authActions';
 
 const SignUpScreen = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMatch, setPasswordMatch] = useState(false);
@@ -45,7 +46,6 @@ const SignUpScreen = ({ navigation }) => {
   );
 
   useEffect(() => {
-    console.log(formState);
     const password = formState.inputs.password.value;
     const confirmPassword = formState.inputs.confirmPassword.value;
     if (formState.isValid && password === confirmPassword) {
@@ -53,14 +53,42 @@ const SignUpScreen = ({ navigation }) => {
     } else {
       setPasswordMatch(false);
     }
-    console.log(formState);
   }, [formState]);
 
   const logInHandler = () => {
     navigation.navigate('LoginScreen');
   };
 
-  const signUpHandler = () => {};
+  const dispatch = useDispatch();
+
+  const signUpHandler = async () => {
+    await dispatch(
+      authActions.signup(
+        formState.inputs.email.value,
+        formState.inputs.password.value
+      )
+    );
+  };
+
+  const clearError = async () => {
+    await dispatch(authActions.clearError);
+  };
+  const error = useSelector((state) => state.auth.error);
+  const isLoading = useSelector((state) => state.auth.isLoading);
+
+  useEffect(() => {
+    console.log(error);
+    if (error) {
+      Alert.alert('An Error Occured', error, [
+        {
+          text: 'Okay',
+          onPress: () => {
+            clearError;
+          },
+        },
+      ]);
+    }
+  }, [error]);
 
   const emailIcon = <Ionicons name="person-outline" size={24} color="black" />;
   const emailIcon2 = formState.inputs.email.isValid && (
@@ -72,7 +100,7 @@ const SignUpScreen = ({ navigation }) => {
     <Ionicons name="md-lock-closed-outline" size={22} color="black" />
   );
   const passIcon2 = (
-    <TouchableOpacity onPress={() => setShowPasssword(!showPassword)}>
+    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
       <Ionicons name="eye-off-outline" size={22} color="black" />
     </TouchableOpacity>
   );
@@ -145,25 +173,49 @@ const SignUpScreen = ({ navigation }) => {
 
             <View style={styles.buttonContainer}>
               <MainButton
+                disabled={isLoading}
                 linearGradient
+                colors={isLoading && ['#9c9c9c', '#9c9c9c']}
                 style={styles.button}
-                text="Sign up"
                 textStyle={[styles.buttonText, { color: '#fff' }]}
-                onClick={() => {}}
-              ></MainButton>
+                onClick={signUpHandler}
+              >
+                {!isLoading ? (
+                  'Sign up'
+                ) : (
+                  <ActivityIndicator size="large" color={Colors.primary} />
+                )}
+              </MainButton>
               <MainButton
+                disabled={isLoading}
                 onClick={logInHandler}
-                style={[
-                  styles.button,
-                  {
-                    borderColor: Colors.primary,
-                    borderWidth: 1,
-                    marginTop: 20,
-                  },
-                ]}
-                textStyle={[styles.buttonText, { color: Colors.primary }]}
-                text="Log in"
-              ></MainButton>
+                style={
+                  isLoading
+                    ? [
+                        styles.button,
+                        {
+                          borderColor: '#9c9c9c',
+                          borderWidth: 1,
+                          marginTop: 20,
+                        },
+                      ]
+                    : [
+                        styles.button,
+                        {
+                          borderColor: Colors.primary,
+                          borderWidth: 1,
+                          marginTop: 20,
+                        },
+                      ]
+                }
+                textStyle={
+                  isLoading
+                    ? [styles.buttonText, { color: '#9c9c9c' }]
+                    : [styles.buttonText, { color: Colors.primary }]
+                }
+              >
+                Log in
+              </MainButton>
             </View>
           </ScrollView>
         </Animatable.View>

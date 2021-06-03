@@ -1,19 +1,12 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  Dimensions,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import Colors from '../constants/Colors';
 import MainButton from '../components/UI/MainButton';
+
+const buttonText = 'Get Started ';
 
 const SplashScreen = ({ navigation }) => {
   const buttonHandler = () => {
@@ -37,11 +30,8 @@ const SplashScreen = ({ navigation }) => {
           Sign in with an existing account or create one now.
         </Text>
         <View style={styles.buttonContainer}>
-          <MainButton
-            onClick={buttonHandler}
-            text="Get Started "
-            linearGradient
-          >
+          <MainButton onClick={buttonHandler} linearGradient>
+            {buttonText}
             <Ionicons name="navigate-outline" size={20} color="#fff" />
           </MainButton>
         </View>

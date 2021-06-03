@@ -5,6 +5,7 @@ import {
   LOGIN_STARTED,
   LOGIN_SUCCEEDED,
   LOGIN_FAILED,
+  CLEAR_ERROR,
 } from '../actions/authActions';
 
 const initialState = {
@@ -48,6 +49,10 @@ export default (state = initialState, action) => {
       return {
         ...state,
         isLoading: true,
+        error: null,
+        token: null,
+        userId: null,
+        userEmail: null,
       };
     case SIGNUP_SUCCEEDED:
       return {
@@ -56,6 +61,7 @@ export default (state = initialState, action) => {
         userId: action.payload.userId,
         userEmail: action.payload.userEmail,
         isLoading: false,
+        error: null,
       };
     case SIGNUP_FAILED:
       return {
@@ -66,6 +72,8 @@ export default (state = initialState, action) => {
         userEmail: null,
         error: action.payload.error,
       };
+    case CLEAR_ERROR:
+      return { ...state, error: null };
     default:
       return state;
   }

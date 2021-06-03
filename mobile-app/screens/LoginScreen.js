@@ -55,12 +55,22 @@ const LoginScreen = ({ navigation }) => {
     );
   };
 
+  const clearError = async () => {
+    await dispatch(authActions.clearError);
+  };
   const error = useSelector((state) => state.auth.error);
   const isLoading = useSelector((state) => state.auth.isLoading);
 
   useEffect(() => {
     if (error) {
-      Alert.alert('An Error Occured', error, [{ text: 'Okay' }]);
+      Alert.alert('An Error Occured', error, [
+        {
+          text: 'Okay',
+          onPress: () => {
+            clearError;
+          },
+        },
+      ]);
     }
   }, [error]);
 
