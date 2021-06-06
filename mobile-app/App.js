@@ -4,11 +4,19 @@ import * as Font from 'expo-font';
 import { Provider } from 'react-redux';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import authReducer from './store/reducers/authReducer';
+import productReducer from './store/reducers/productReducer';
+//import cartReducer from './store/reducers/cartReducer';
+//import orderReducer from './store/reducers/orderReducer';
+import categoryReducer from './store/reducers/categoryReducer';
 import ReduxThunk from 'redux-thunk';
 import AppNavigator from './navigation/AppNavigator';
 
 const rootStore = combineReducers({
   auth: authReducer,
+  products: productReducer,
+  //cart: cartReducer,
+  //order: orderReducer,
+  category: categoryReducer,
 });
 
 const store = createStore(rootStore, applyMiddleware(ReduxThunk));
