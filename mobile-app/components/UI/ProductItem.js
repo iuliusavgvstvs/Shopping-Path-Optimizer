@@ -24,7 +24,7 @@ const ProductItem = (props) => {
           <Button title="-" type="clear" />
         </View>
         <View style={styles.button}>
-          <Text style={styles.quantity}>1</Text>
+          <Text style={styles.quantity}>{props.quantity}</Text>
         </View>
         <View style={styles.button}>
           <Button title="+" type="clear" />

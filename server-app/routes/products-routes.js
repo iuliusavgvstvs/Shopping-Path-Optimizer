@@ -9,7 +9,12 @@ router.use(checkAuth);
 
 router.get('/', productsControllers.getProducts);
 
-router.get('/:categoryId', productsControllers.getProductsByCategoryId);
+router.get(
+  '/categories/:categoryId',
+  productsControllers.getProductsByCategoryId
+);
+
+router.get('/:s', productsControllers.getProductsByName);
 
 router.post(
   '/new',

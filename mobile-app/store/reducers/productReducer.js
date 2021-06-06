@@ -2,6 +2,7 @@ import {
   FETCH_PRODUCTS_STARTED,
   FETCH_PRODUCTS_SUCCEEDED,
   FETCH_PRODUCTS_FAILED,
+  CLEAR_PRODUCTS_ERROR,
 } from '../actions/productActions';
 
 const initialState = {
@@ -31,6 +32,8 @@ export default (state = initialState, action) => {
         error: action.payload,
         isLoading: false,
       };
+    case CLEAR_PRODUCTS_ERROR:
+      return { ...state, error: null };
   }
   return state;
 };

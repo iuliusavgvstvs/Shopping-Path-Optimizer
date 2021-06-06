@@ -3,6 +3,7 @@ import axios from 'axios';
 export const FETCH_CATEGORY_STARTED = 'SET_CATEGORIES';
 export const FETCH_CATEGORY_FAILED = 'FETCH_CATEGORY_FAILED';
 export const FETCH_CATEGORY_SUCCEEDED = 'FETCH_CATEGORY_SUCCEEDED';
+export const CLEAR_CATEGORY_ERROR = 'CLEAR_CATEGORY_ERROR';
 
 const axiosInstance = axios.create({
   baseURL: 'http://192.168.1.100:5000/api',
@@ -30,5 +31,11 @@ export const fetchCategories = (token) => {
         err = 'Fetching categories takes too long. Please try again later.';
       dispatch({ type: FETCH_CATEGORY_FAILED, payload: err });
     }
+  };
+};
+
+export const clearError = () => {
+  return async (dispatch) => {
+    dispatch({ type: CLEAR_CATEGORY_ERROR });
   };
 };

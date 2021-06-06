@@ -23,7 +23,24 @@ const getProductsByCategoryId = async (req, res, next) => {
     products = await Product.find({ category: categoryId });
   } catch (err) {
     return next(
-      new HttpError('Error fetching products with given category', 500)
+      new HttpError('Error fetching products with given category id', 500)
+    );
+  }
+  res.json({
+    products: products.map((product) => product.toObject({ getters: true })),
+  });
+};
+
+const getProductsByName = async (req, res, next) => {
+  const searchString = req.params.s;
+  let products;
+  try {
+    products = await Product.find({
+      title: { $regex: searchString, $options: 'i' },
+    });
+  } catch (err) {
+    return next(
+      new HttpError('Error fetching products with given product name', 500)
     );
   }
   res.json({
@@ -55,4 +72,5 @@ const createProduct = async (req, res, next) => {
 };
 exports.getProducts = getProducts;
 exports.getProductsByCategoryId = getProductsByCategoryId;
+exports.getProductsByName = getProductsByName;
 exports.createProduct = createProduct;

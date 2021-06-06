@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import CustomHeaderButton from '../components/UI/HeaderButton';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -16,13 +17,13 @@ import SearchProductItem from '../components/UI/SearchProductItem';
 import { useSelector, useDispatch } from 'react-redux';
 import * as categoryActions from '../store/actions/categoryActions';
 import * as productsActions from '../store/actions/productActions';
+import * as cartActions from '../store/actions/cartActions';
+import CartItem from '../models/cart-item';
 
 const ProductsScreen = (props) => {
   const [searchText, setSearchText] = useState('');
   const [searchCategoryId, setSearchCategoryId] = useState(null);
-  const [filteredProducts, setFilteredProducts] = useState(null);
-  const [list, setList] = useState([]);
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [myTimeout, setMyTimeout] = useState();
 
   useEffect(() => {
     props.navigation.setOptions({
@@ -41,7 +42,6 @@ const ProductsScreen = (props) => {
     });
   }, [props.navigation]);
 
-  const state = useSelector((state) => state);
   const categories = useSelector((state) => state.category.availableCategories);
   const products = useSelector((state) => state.products.availableProducts);
   const isLoadingCategories = useSelector((state) => state.category.isLoading);
@@ -49,6 +49,8 @@ const ProductsScreen = (props) => {
   const categoryError = useSelector((state) => state.category.error);
   const productsError = useSelector((state) => state.products.error);
   const token = useSelector((state) => state.auth.token);
+  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const items = useSelector((state) => state.cart.items);
 
   const dispatch = useDispatch();
 
@@ -56,21 +58,56 @@ const ProductsScreen = (props) => {
     dispatch(categoryActions.fetchCategories(token));
   }, [dispatch]);
 
+  const clearCategoryError = async () => {
+    await dispatch(categoryActions.clearError);
+  };
+
+  const clearProductError = async () => {
+    await dispatch(productsActions.clearError);
+  };
+
+  useEffect(() => {
+    if (categoryError) {
+      Alert.alert('An Error Occured', categoryError, [
+        {
+          text: 'Okay',
+          onPress: () => {
+            clearCategoryError;
+          },
+        },
+      ]);
+    }
+    if (productsError) {
+      Alert.alert('An Error Occured', productsError, [
+        {
+          text: 'Okay',
+          onPress: () => {
+            clearProductError;
+          },
+        },
+      ]);
+    }
+  }, [categoryError, productsError]);
+
   const updateSearch = (search) => {
     setSearchCategoryId(null);
     setSearchText(search);
-    let filteredProducts = null;
-    if (products) {
-      filteredProducts = products.filter((product) =>
-        product.title.toLowerCase().includes(search)
-      );
-    }
-    setFilteredProducts(filteredProducts);
+    clearTimeout(myTimeout);
+    setMyTimeout(
+      setTimeout(
+        () => dispatch(productsActions.fetchProductsByName(token, search)),
+        500
+      )
+    );
   };
 
   const selectCategoryHandler = (id) => {
     setSearchCategoryId(id);
     dispatch(productsActions.fetchProductsByCatId(token, id));
+  };
+
+  const addHandler = (id, title, imageUrl, price) => {
+    dispatch(cartActions.addToCart({ id, price, title, imageUrl }));
   };
   const renderGridItem = (itemData) => {
     if (isLoadingCategories) {
@@ -131,17 +168,19 @@ const ProductsScreen = (props) => {
             {categoryName === null && productsNo === 0 && `No products found`}
           </Text>
         </View>
-        <View
-          style={{
-            width: '20%',
-          }}
-        >
-          <Button
-            title="Go back"
-            type="outline"
-            onPress={() => setSearchCategoryId(null)}
-          />
-        </View>
+        {searchText === '' && (
+          <View
+            style={{
+              width: '20%',
+            }}
+          >
+            <Button
+              title="Go back"
+              type="outline"
+              onPress={() => setSearchCategoryId(null)}
+            />
+          </View>
+        )}
       </View>
     );
   };
@@ -163,7 +202,14 @@ const ProductsScreen = (props) => {
             keyExtractor={(item) => item.id}
             renderItem={(itemData) => (
               <SearchProductItem
-                onPress={addHandler}
+                onPress={() =>
+                  addHandler(
+                    itemData.item.id,
+                    itemData.item.title,
+                    itemData.item.imageUrl,
+                    itemData.item.price
+                  )
+                }
                 title={itemData.item.title}
                 description={itemData.item.description}
                 price={itemData.item.price}
@@ -177,16 +223,18 @@ const ProductsScreen = (props) => {
   };
 
   const ShoppingList = () => {
-    return list.length1 == 0 ? (
+    console.log('items aici:', Object.values(items));
+    return items.length !== 0 ? (
       <FlatList
         style={{ flex: 1, width: '100%' }}
-        data={list}
-        keyExtractor={(item) => item.id}
+        data={Object.values(items)}
+        keyExtractor={(item) => item.productId}
         renderItem={(itemData) => (
           <ProductItem
-            title={itemData.item.title}
-            imageUrl={itemData.item.imageUrl}
-            price={itemData.item.price}
+            title={itemData.item.productTitle}
+            imageUrl={itemData.item.productImageUrl}
+            quantity={itemData.item.quantity}
+            price={itemData.item.sum}
           />
         )}
       />
@@ -195,10 +243,6 @@ const ProductsScreen = (props) => {
         No products added yet. Start by adding products from the list above.
       </Text>
     );
-  };
-
-  const addHandler = () => {
-    console.log('product added');
   };
 
   return (
