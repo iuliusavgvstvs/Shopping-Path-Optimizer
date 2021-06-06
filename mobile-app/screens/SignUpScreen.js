@@ -77,7 +77,6 @@ const SignUpScreen = ({ navigation }) => {
   const isLoading = useSelector((state) => state.auth.isLoading);
 
   useEffect(() => {
-    console.log(error);
     if (error) {
       Alert.alert('An Error Occured', error, [
         {

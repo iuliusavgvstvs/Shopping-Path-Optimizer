@@ -6,7 +6,6 @@ import DrawerNavigator from '../screens/ShopScreen';
 
 const AppNavigator = () => {
   const isLoggedIn = useSelector((state) => !!state.auth.token);
-  console.log('>>>>>>>>>>>>>>>>>>>>IS LOGIN AICI', isLoggedIn);
   return (
     <NavigationContainer>
       {isLoggedIn ? <DrawerNavigator /> : <RootScreen />}

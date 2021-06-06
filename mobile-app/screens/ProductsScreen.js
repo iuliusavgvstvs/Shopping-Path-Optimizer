@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import CustomHeaderButton from '../components/UI/HeaderButton';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import Colors from '../constants/Colors';
-import { SearchBar, ListItem, Avatar, Button } from 'react-native-elements';
+import { SearchBar, Button } from 'react-native-elements';
 import ProductItem from '../components/UI/ProductItem';
 import CategoryGridTile from '../components/UI/CategoryGridTile';
+import SearchProductItem from '../components/UI/SearchProductItem';
 
 const PRODUCTS = [
   {
@@ -135,10 +136,11 @@ const CATEGORIES = [
   },
 ];
 const ProductsScreen = (props) => {
-  const [searchText, setSearchText] = useState();
+  const [searchText, setSearchText] = useState('');
   const [products, setProducts] = useState(PRODUCTS);
   const [categories, setCategories] = useState(CATEGORIES);
   const [searchCategoryId, setSearchCategoryId] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState(null);
   useEffect(() => {
     props.navigation.setOptions({
       title: 'Search Products',
@@ -156,28 +158,41 @@ const ProductsScreen = (props) => {
     });
   }, [props.navigation]);
   const updateSearch = (search) => {
+    setSearchCategoryId(null);
     setSearchText(search);
+    const filteredProducts = products.filter((product) =>
+      product.title.toLowerCase().includes(search)
+    );
+    setFilteredProducts(filteredProducts);
   };
 
+  const selectCategoryHandler = (id) => {
+    setSearchCategoryId(id);
+    const filteredProducts = products.filter(
+      (product) => product.categoryId === id
+    );
+    setFilteredProducts(filteredProducts);
+  };
   const renderGridItem = (itemData) => {
     return (
       <CategoryGridTile
         title={itemData.item.title}
         imageUrl={itemData.item.imageUrl}
         onSelect={() => {
-          setSearchCategoryId(itemData.item.id);
+          selectCategoryHandler(itemData.item.id);
         }}
       />
     );
   };
 
   const InfoBar = () => {
-    const categoryName = categories.find(
-      (cat) => cat.id === searchCategoryId
-    ).title;
-    const productsNo = products.filter(
-      (prod) => prod.categoryId === searchCategoryId
-    ).length;
+    let categoryName = null;
+    const productsNo = filteredProducts.length;
+    if (searchCategoryId) {
+      categoryName = categories.find(
+        (cat) => cat.id === searchCategoryId
+      ).title;
+    }
     return (
       <View
         style={{
@@ -191,9 +206,20 @@ const ProductsScreen = (props) => {
       >
         <View style={{ flex: 1 }}>
           <Text>
-            {productsNo > 0
-              ? `Showing ${productsNo} products from category ${categoryName}`
-              : `No products found for this category`}
+            {categoryName &&
+              productsNo > 1 &&
+              `Showing ${productsNo} products from ${categoryName}`}
+            {categoryName &&
+              productsNo === 1 &&
+              `Showing 1 product from ${categoryName}`}
+            {categoryName &&
+              productsNo === 0 &&
+              `No products found for this category`}
+            {categoryName === null &&
+              productsNo > 1 &&
+              `Found ${productsNo} products`}
+            {categoryName === null && productsNo === 1 && `Found 1 product`}
+            {categoryName === null && productsNo === 0 && `No products found`}
           </Text>
         </View>
         <View
@@ -211,6 +237,33 @@ const ProductsScreen = (props) => {
     );
   };
 
+  const SearchResultList = () => {
+    return (
+      <>
+        <InfoBar />
+        <View style={{ flex: 7 }}>
+          <FlatList
+            data={filteredProducts}
+            keyExtractor={(item) => item.id}
+            renderItem={(itemData) => (
+              <SearchProductItem
+                onPress={addHandler}
+                title={itemData.item.title}
+                description={itemData.item.description}
+                price={itemData.item.price}
+                imageUrl={itemData.item.imageUrl}
+              />
+            )}
+          />
+        </View>
+      </>
+    );
+  };
+
+  const addHandler = () => {
+    console.log('product added');
+  };
+
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -224,29 +277,14 @@ const ProductsScreen = (props) => {
           />
         </View>
         <View style={styles.searchResults}>
-          {!searchCategoryId ? (
+          {searchCategoryId === null && searchText === '' ? (
             <FlatList
               data={categories}
               renderItem={renderGridItem}
               numColumns={2}
             />
           ) : (
-            <>
-              <InfoBar />
-              <View style={{ flex: 7 }}>
-                {products
-                  .filter((product) => product.categoryId === searchCategoryId)
-                  .map((l, i) => (
-                    <ListItem key={i} bottomDivider>
-                      <Avatar source={{ uri: l.imageUrl }} />
-                      <ListItem.Content>
-                        <ListItem.Title>{l.title}</ListItem.Title>
-                        <ListItem.Subtitle>{l.description}</ListItem.Subtitle>
-                      </ListItem.Content>
-                    </ListItem>
-                  ))}
-              </View>
-            </>
+            <SearchResultList />
           )}
         </View>
       </View>
