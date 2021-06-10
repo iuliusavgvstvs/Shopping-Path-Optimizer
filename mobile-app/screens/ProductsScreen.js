@@ -18,7 +18,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as categoryActions from '../store/actions/categoryActions';
 import * as productsActions from '../store/actions/productActions';
 import * as cartActions from '../store/actions/cartActions';
-import CartItem from '../models/cart-item';
 
 const ProductsScreen = (props) => {
   const [searchText, setSearchText] = useState('');
@@ -28,6 +27,17 @@ const ProductsScreen = (props) => {
   useEffect(() => {
     props.navigation.setOptions({
       title: 'Search Products',
+      headerRight: () => (
+        <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+          <Item
+            title="Cart"
+            iconName={Platform.OS === 'android' ? 'cart-outline' : 'ios-cart'}
+            onPress={() => {
+              props.navigation.navigate('Path');
+            }}
+          />
+        </HeaderButtons>
+      ),
       headerLeft: () => (
         <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
           <Item
@@ -108,6 +118,9 @@ const ProductsScreen = (props) => {
 
   const addHandler = (id, title, imageUrl, price) => {
     dispatch(cartActions.addToCart({ id, price, title, imageUrl }));
+  };
+  const removeHandler = (id) => {
+    dispatch(cartActions.removeFromCart(id));
   };
   const renderGridItem = (itemData) => {
     if (isLoadingCategories) {
@@ -223,11 +236,11 @@ const ProductsScreen = (props) => {
   };
 
   const ShoppingList = () => {
-    console.log('items aici:', Object.values(items));
-    return items.length !== 0 ? (
+    const items2 = Object.values(items).reverse();
+    return Object.values(items).length > 0 ? (
       <FlatList
         style={{ flex: 1, width: '100%' }}
-        data={Object.values(items)}
+        data={items2}
         keyExtractor={(item) => item.productId}
         renderItem={(itemData) => (
           <ProductItem
@@ -235,6 +248,15 @@ const ProductsScreen = (props) => {
             imageUrl={itemData.item.productImageUrl}
             quantity={itemData.item.quantity}
             price={itemData.item.sum}
+            addHandler={() =>
+              addHandler(
+                itemData.item.productId,
+                itemData.item.productTitle,
+                itemData.item.productImageUrl,
+                itemData.item.productPrice
+              )
+            }
+            removeHandler={() => removeHandler(itemData.item.productId)}
           />
         )}
       />
@@ -276,7 +298,7 @@ const ProductsScreen = (props) => {
           </View>
           <View>
             <Text style={styles.footerTitleText}>
-              Total Amount: {totalAmount}$
+              Total Amount: {totalAmount.toFixed(2)}$
             </Text>
           </View>
         </View>

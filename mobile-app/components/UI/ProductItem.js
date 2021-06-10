@@ -21,13 +21,13 @@ const ProductItem = (props) => {
       </View>
       <View style={styles.buttonContainer}>
         <View style={styles.button}>
-          <Button title="-" type="clear" />
+          <Button title="-" type="clear" onPress={props.removeHandler} />
         </View>
         <View style={styles.button}>
           <Text style={styles.quantity}>{props.quantity}</Text>
         </View>
         <View style={styles.button}>
-          <Button title="+" type="clear" />
+          <Button title="+" type="clear" onPress={props.addHandler} />
         </View>
       </View>
     </View>

@@ -5,6 +5,7 @@ import HomeScreen from './HomeScreen';
 import ProductsScreen from './ProductsScreen';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
+import PathScreen from './PathScreen';
 
 const homeStackScreen = createStackNavigator();
 const productsStackScreen = createStackNavigator();
@@ -41,6 +42,11 @@ const ProductsStackNavigator = ({ navigation }) => (
       name="Products"
       component={ProductsScreen}
       options={defaultScreenConfig}
+    />
+    <productsStackScreen.Screen
+      name="Path"
+      component={PathScreen}
+      options={{ headerShown: false }}
     />
   </productsStackScreen.Navigator>
 );

@@ -38,7 +38,7 @@ export default (state = initialState, action) => {
         );
       }
       return {
-        items: { [addedProduct.id]: updatedOrNewCartItem, ...state.items },
+        items: { ...state.items, [addedProduct.id]: updatedOrNewCartItem },
         totalAmount: state.totalAmount + productPrice,
       };
     case REMOVE_FROM_CART:
@@ -47,10 +47,12 @@ export default (state = initialState, action) => {
       let updatedItems;
       if (currentQuantity > 1) {
         const updatedItem = new CartItem(
-          oldItem.quantity - 1,
-          oldItem.productPrice,
+          oldItem.productId,
           oldItem.productTitle,
-          oldItem.sum - oldItem.productPrice
+          oldItem.productImageUrl,
+          oldItem.productPrice,
+          oldItem.quantity - 1,
+          parseFloat(oldItem.sum) - parseFloat(oldItem.productPrice)
         );
         updatedItems = { ...state.items, [action.productId]: updatedItem };
       } else {
