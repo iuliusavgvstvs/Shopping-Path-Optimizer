@@ -15,11 +15,17 @@ router.post(
   [
     check('name').notEmpty(),
     check('coordX').notEmpty(),
-    check('coordy').notEmpty(),
+    check('coordY').notEmpty(),
     check('dimX').notEmpty(),
     check('dimY').notEmpty(),
   ],
   shelfControllers.createShelf
+);
+
+router.post(
+  '/getshelvesconfiguration',
+  [check('shelves').notEmpty()],
+  shelfControllers.getShelvesConfiguration
 );
 
 module.exports = router;

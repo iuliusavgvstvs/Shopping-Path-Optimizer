@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -18,11 +18,23 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as categoryActions from '../store/actions/categoryActions';
 import * as productsActions from '../store/actions/productActions';
 import * as cartActions from '../store/actions/cartActions';
+import * as pathActions from '../store/actions/pathActions';
 
 const ProductsScreen = (props) => {
   const [searchText, setSearchText] = useState('');
   const [searchCategoryId, setSearchCategoryId] = useState(null);
   const [myTimeout, setMyTimeout] = useState();
+
+  const categories = useSelector((state) => state.category.availableCategories);
+  const products = useSelector((state) => state.products.availableProducts);
+  const isLoadingCategories = useSelector((state) => state.category.isLoading);
+  const isLoadingProducts = useSelector((state) => state.products.isLoading);
+  const categoryError = useSelector((state) => state.category.error);
+  const productsError = useSelector((state) => state.products.error);
+  const token = useSelector((state) => state.auth.token);
+  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const items = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     props.navigation.setOptions({
@@ -32,9 +44,7 @@ const ProductsScreen = (props) => {
           <Item
             title="Cart"
             iconName={Platform.OS === 'android' ? 'cart-outline' : 'ios-cart'}
-            onPress={() => {
-              props.navigation.navigate('Path');
-            }}
+            onPress={handleCartButton}
           />
         </HeaderButtons>
       ),
@@ -50,19 +60,7 @@ const ProductsScreen = (props) => {
         </HeaderButtons>
       ),
     });
-  }, [props.navigation]);
-
-  const categories = useSelector((state) => state.category.availableCategories);
-  const products = useSelector((state) => state.products.availableProducts);
-  const isLoadingCategories = useSelector((state) => state.category.isLoading);
-  const isLoadingProducts = useSelector((state) => state.products.isLoading);
-  const categoryError = useSelector((state) => state.category.error);
-  const productsError = useSelector((state) => state.products.error);
-  const token = useSelector((state) => state.auth.token);
-  const totalAmount = useSelector((state) => state.cart.totalAmount);
-  const items = useSelector((state) => state.cart.items);
-
-  const dispatch = useDispatch();
+  }, [props.navigation, items]);
 
   useEffect(() => {
     dispatch(categoryActions.fetchCategories(token));
@@ -99,6 +97,32 @@ const ProductsScreen = (props) => {
     }
   }, [categoryError, productsError]);
 
+  var handleCartButton = () => {
+    if (Object.values(items).length === 0) {
+      Alert.alert(
+        'Could not proceed',
+        'You need to add items in your list first',
+        [{ text: 'Okay' }]
+      );
+    } else {
+      Alert.alert(
+        'Are you sure?',
+        `Do you want to generate the path for the current items?  The total amount is ${totalAmount}`,
+        [
+          { text: 'No', style: 'cancel' },
+          {
+            text: 'Yes',
+            style: 'default',
+            onPress: () => {
+              dispatch(pathActions.initPath(token, Object.values(items)));
+              props.navigation.navigate('Path');
+            },
+          },
+        ]
+      );
+    }
+  };
+
   const updateSearch = (search) => {
     setSearchCategoryId(null);
     setSearchText(search);
@@ -116,8 +140,8 @@ const ProductsScreen = (props) => {
     dispatch(productsActions.fetchProductsByCatId(token, id));
   };
 
-  const addHandler = (id, title, imageUrl, price) => {
-    dispatch(cartActions.addToCart({ id, price, title, imageUrl }));
+  const addHandler = (id, shelfId, title, imageUrl, price) => {
+    dispatch(cartActions.addToCart({ id, shelfId, price, title, imageUrl }));
   };
   const removeHandler = (id) => {
     dispatch(cartActions.removeFromCart(id));
@@ -218,6 +242,7 @@ const ProductsScreen = (props) => {
                 onPress={() =>
                   addHandler(
                     itemData.item.id,
+                    itemData.item.shelf[0][0],
                     itemData.item.title,
                     itemData.item.imageUrl,
                     itemData.item.price
@@ -251,6 +276,7 @@ const ProductsScreen = (props) => {
             addHandler={() =>
               addHandler(
                 itemData.item.productId,
+                itemData.item.shelfId,
                 itemData.item.productTitle,
                 itemData.item.productImageUrl,
                 itemData.item.productPrice

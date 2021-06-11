@@ -53,7 +53,7 @@ const createProduct = async (req, res, next) => {
   if (!errors.isEmpty()) {
     return next(new HttpError('Invalid inputs passed.', 422));
   }
-  const { title, description, imageUrl, price, category } = req.body;
+  const { title, description, imageUrl, price, category, shelf } = req.body;
 
   const createdProduct = new Product({
     title,
@@ -61,6 +61,7 @@ const createProduct = async (req, res, next) => {
     imageUrl,
     price,
     category,
+    shelf,
   });
 
   try {

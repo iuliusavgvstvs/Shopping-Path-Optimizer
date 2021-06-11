@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 
 const shelfSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
+  name: { type: String, required: true, unique: true },
   coordX: { type: String, required: true },
   coordY: { type: String, required: true },
   dimX: { type: String, required: true },

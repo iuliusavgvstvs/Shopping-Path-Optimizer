@@ -14,12 +14,14 @@ export default (state = initialState, action) => {
       const productPrice = parseFloat(addedProduct.price);
       const productTitle = addedProduct.title;
       const productImageUrl = addedProduct.imageUrl;
+      const productShelfId = addedProduct.shelfId;
 
       let updatedOrNewCartItem;
 
       if (state.items[addedProduct.id]) {
         updatedOrNewCartItem = new CartItem(
           addedProduct.id,
+          productShelfId,
           productTitle,
           productImageUrl,
           productPrice,
@@ -30,6 +32,7 @@ export default (state = initialState, action) => {
       } else {
         updatedOrNewCartItem = new CartItem(
           addedProduct.id,
+          productShelfId,
           productTitle,
           productImageUrl,
           parseFloat(productPrice),
@@ -48,6 +51,7 @@ export default (state = initialState, action) => {
       if (currentQuantity > 1) {
         const updatedItem = new CartItem(
           oldItem.productId,
+          productShelfId,
           oldItem.productTitle,
           oldItem.productImageUrl,
           oldItem.productPrice,

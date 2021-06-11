@@ -26,6 +26,7 @@ const PathScreen = (props) => {
   const [noItems, setNoItems] = useState(0);
   const [cartAmount, setCartAmount] = useState(0);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const isLoadingPath = useSelector((state) => state.path.isLoadingPath);
   const items = useSelector((state) => state.cart.items);
   const [map, setmap] = useState([
     { name: 'TURQUOISE', code: '#1abc9c' },
@@ -70,6 +71,14 @@ const PathScreen = (props) => {
       />
     );
   };
+
+  if (isLoadingPath) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   const RenderMap = () => {
     const matr = [
@@ -553,9 +562,7 @@ const PathScreen = (props) => {
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <View>
-          <RenderMap />
-        </View>
+        <View>{/* <RenderMap /> */}</View>
       </View>
       <View style={styles.footer}>
         <View style={styles.footerTitleContainer}>

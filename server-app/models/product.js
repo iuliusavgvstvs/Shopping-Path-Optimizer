@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   price: { type: String, required: true },
   category: [{ type: mongoose.Types.ObjectId, require: true, ref: 'Category' }],
+  shelf: [[{ type: mongoose.Types.ObjectId, require: true, ref: 'Shelf' }]],
 });
 
 productSchema.plugin(uniqueValidator);

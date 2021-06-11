@@ -24,6 +24,7 @@ router.post(
     check('imageUrl').notEmpty(),
     check('price').notEmpty(),
     check('category').notEmpty(),
+    check('shelf').notEmpty(),
   ],
   productsControllers.createProduct
 );
