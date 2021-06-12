@@ -1,7 +1,5 @@
 import React, { useReducer, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput } from 'react-native';
-import Colors from '../../constants/Colors';
-
 import { validate } from '../utils/validators';
 
 const INPUT_CHANGE = 'INPUT_CHANGE';

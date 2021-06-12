@@ -64,7 +64,7 @@ function solve(points, temp_coeff, callback) {
   if (points.length < 2) return path.order; // There is nothing to optimize
   if (!temp_coeff)
     temp_coeff = 1 - Math.exp(-10 - Math.min(points.length, 1e6) / 1e5);
-  var has_callback = typeof callback === "function";
+  var has_callback = typeof callback === 'function';
 
   for (
     var temperature = 100 * distance(path.access(0), path.access(1));

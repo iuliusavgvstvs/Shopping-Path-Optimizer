@@ -25,7 +25,6 @@ export const fetchProductsByCatId = (token, categoryId) => {
       const responseData = response.data;
       dispatch({ type: FETCH_PRODUCTS_SUCCEEDED, payload: responseData });
     } catch (error) {
-      console.log('eroare la fetch products', error);
       let err = 'Fetching products failed. Please try again later.';
       if (!error.response)
         err = 'Fetching products takes too long. Please try again later.';
@@ -48,7 +47,6 @@ export const fetchProductsByName = (token, searchString) => {
       const responseData = response.data;
       dispatch({ type: FETCH_PRODUCTS_SUCCEEDED, payload: responseData });
     } catch (error) {
-      console.log('eroare la fetch products', error);
       let err = 'Fetching products failed. Please try again later.';
       if (!error.response)
         err = 'Fetching products takes too long. Please try again later.';

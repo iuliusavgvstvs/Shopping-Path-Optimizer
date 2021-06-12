@@ -38,7 +38,6 @@ const createConfig = async (req, res, next) => {
   try {
     await createdConfig.save();
   } catch (err) {
-    console.log(err);
     return next(new HttpError('Adding a new config failed.', 500));
   }
   res.status(201).json({ config: createdConfig });

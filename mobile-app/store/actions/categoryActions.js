@@ -25,7 +25,6 @@ export const fetchCategories = (token) => {
       const responseData = response.data;
       dispatch({ type: FETCH_CATEGORY_SUCCEEDED, payload: responseData });
     } catch (error) {
-      console.log('eroare la fetch categories', error);
       let err = 'Fetching categories failed. Please try again later.';
       if (!error.response)
         err = 'Fetching categories takes too long. Please try again later.';

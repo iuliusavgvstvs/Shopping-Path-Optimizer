@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,69 +6,116 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
-  SectionList,
   ScrollView,
 } from 'react-native';
-import CustomHeaderButton from '../components/UI/HeaderButton';
-import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import Colors from '../constants/Colors';
-import { SearchBar, Button } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import ProductItem from '../components/UI/ProductItem';
-import CategoryGridTile from '../components/UI/CategoryGridTile';
-import SearchProductItem from '../components/UI/SearchProductItem';
 import { useSelector, useDispatch } from 'react-redux';
-import * as categoryActions from '../store/actions/categoryActions';
-import * as productsActions from '../store/actions/productActions';
-import * as cartActions from '../store/actions/cartActions';
-import { FlatGrid } from 'react-native-super-grid';
+
+import * as pathActions from '../store/actions/pathActions';
 
 const PathScreen = (props) => {
-  const [noItems, setNoItems] = useState(0);
-  const [cartAmount, setCartAmount] = useState(0);
-  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  const token = useSelector((state) => state.auth.token);
+  const items = useSelector((state) => state.path.items);
+  const itemsToPick = useSelector((state) => state.path.itemsToPick);
   const isLoadingPath = useSelector((state) => state.path.isLoadingPath);
-  const items = useSelector((state) => state.cart.items);
-  const [map, setmap] = useState([
-    { name: 'TURQUOISE', code: '#1abc9c' },
-    { name: 'EMERALD', code: '#2ecc71' },
-    { name: 'PETER RIVER', code: '#3498db' },
-    { name: 'AMETHYST', code: '#9b59b6' },
-    { name: 'WET ASPHALT', code: '#34495e' },
-    { name: 'GREEN SEA', code: '#16a085' },
-    { name: 'NEPHRITIS', code: '#27ae60' },
-    { name: 'BELIZE HOLE', code: '#2980b9' },
-    { name: 'WISTERIA', code: '#8e44ad' },
-    { name: 'MIDNIGHT BLUE', code: '#2c3e50' },
-    { name: 'SUN FLOWER', code: '#f1c40f' },
-    { name: 'CARROT', code: '#e67e22' },
-    { name: 'ALIZARIN', code: '#e74c3c' },
-    { name: 'CLOUDS', code: '#ecf0f1' },
-    { name: 'CONCRETE', code: '#95a5a6' },
-    { name: 'ORANGE', code: '#f39c12' },
-    { name: 'PUMPKIN', code: '#d35400' },
-    { name: 'POMEGRANATE', code: '#c0392b' },
-    { name: 'SILVER', code: '#bdc3c7' },
-    { name: 'ASBESTOS', code: '#7f8c8d' },
-  ]);
-
+  const path = useSelector((state) => state.path.path);
+  const totalAmount = useSelector((state) => state.path.totalAmount);
+  const itemsInCart = useSelector((state) => state.path.itemsInCart);
+  const currentShelf = useSelector((state) => state.path.currentShelf);
+  const currentShelves = useSelector((state) => state.path.currentShelves);
+  const orderedShelves = useSelector((state) => state.path.orderedShelves);
+  const allShelves = useSelector((state) => state.path.allShelves);
+  const config = useSelector((state) => state.path.config);
   const dispatch = useDispatch();
+  const [stop, setStop] = useState(false);
+
+  const checkHandler = (productId) => {
+    if (currentShelf < currentShelves.length - 1) {
+      if (itemsToPick.length > 1) dispatch(pathActions.checkItem(productId));
+      else if (itemsToPick.length === 1) {
+        dispatch(pathActions.checkItem(productId));
+        dispatch(
+          pathActions.generateNext(
+            token,
+            allShelves,
+            config.dimX,
+            config.dimY,
+            currentShelves[orderedShelves[currentShelf]].coordX,
+            currentShelves[orderedShelves[currentShelf]].coordY,
+            currentShelves[orderedShelves[currentShelf + 1]].coordX,
+            currentShelves[orderedShelves[currentShelf + 1]].coordY
+          )
+        );
+      }
+    }
+    if (currentShelf === currentShelves.length - 1) {
+      if (itemsToPick.length > 1) dispatch(pathActions.checkItem(productId));
+      else if (itemsToPick.length === 1) {
+        dispatch(pathActions.checkItem(productId));
+        dispatch(
+          pathActions.generateNext(
+            token,
+            allShelves,
+            config.dimX,
+            config.dimY,
+            currentShelves[orderedShelves[currentShelf]].coordX,
+            currentShelves[orderedShelves[currentShelf]].coordY,
+            config.endX,
+            config.endY
+          )
+        );
+        setStop(true);
+      }
+    }
+  };
 
   const ShoppingList = () => {
-    const items2 = Object.values(items).reverse();
-    return (
-      <FlatList
-        style={{ flex: 1, width: '100%' }}
-        data={items2}
-        keyExtractor={(item) => item.productId}
-        renderItem={(itemData) => (
-          <ProductItem
-            title={itemData.item.productTitle}
-            imageUrl={itemData.item.productImageUrl}
-            quantity={itemData.item.quantity}
-            price={itemData.item.sum}
+    if (itemsToPick.length > 0 && !stop) {
+      return (
+        <FlatList
+          style={{ flex: 1, width: '100%' }}
+          data={itemsToPick}
+          keyExtractor={(item) => item.productId}
+          renderItem={(itemData) => (
+            <ProductItem
+              title={itemData.item.productTitle}
+              imageUrl={itemData.item.productImageUrl}
+              quantity={itemData.item.quantity}
+              price={itemData.item.sum}
+              checkout="true"
+              checkHandler={() => {
+                checkHandler(itemData.item.productId);
+              }}
+            />
+          )}
+        />
+      );
+    } else if (stop) {
+      return (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+          }}
+        >
+          <Button
+            title="Finish"
+            onPress={() => {
+              Alert.alert('Felicitari!', 'Ati terminat.', [{ text: 'Ok' }]);
+              props.navigation.navigate('Products');
+            }}
           />
-        )}
-      />
+        </View>
+      );
+    }
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
     );
   };
 
@@ -81,416 +128,6 @@ const PathScreen = (props) => {
   }
 
   const RenderMap = () => {
-    const matr = [
-      [
-        {
-          id: '1',
-          type: 'raft-horizontally',
-          dimX: 1,
-          dimY: 1,
-          name: 'mezeluri',
-        },
-        { id: '2', type: 'wall-horizontally', dimX: 5, dimY: 1 },
-        {
-          id: '3',
-          type: 'raft-horizontally',
-          dimX: 1.5,
-          dimY: 1,
-          name: 'legume',
-        },
-        {
-          id: '4',
-          type: 'raft-horizontally',
-          dimX: 5,
-          dimY: 4,
-          name: 'fructe',
-        },
-      ],
-      [
-        {
-          id: '5',
-          type: 'raft-horizontally',
-          dimX: 1,
-          dimY: 1,
-          name: 'dulciuri',
-        },
-        { id: '6', type: 'wall-horizontally', dimX: 5, dimY: 1 },
-        {
-          id: '7',
-          type: 'cafea',
-          dimX: 1.5,
-          dimY: 1,
-          name: 'legume',
-        },
-        {
-          id: '8',
-          type: 'raft-horizontally',
-          dimX: 5,
-          dimY: 4,
-          name: 'alimente de baza',
-        },
-      ],
-    ];
-
-    const mat = [
-      [
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        '+',
-        '+',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        '-',
-        'x',
-      ],
-      [
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-        'x',
-      ],
-    ];
     return (
       <ScrollView
         contentContainerStyle={{
@@ -500,22 +137,27 @@ const PathScreen = (props) => {
         <ScrollView
           horizontal
           contentContainerStyle={{ height: 1000, flexDirection: 'column' }}
+          key={Math.random().toString()}
         >
-          {mat.map((obj) => {
+          {path.map((obj) => {
             return (
-              <View style={{ flexDirection: 'row' }}>
+              <View
+                style={{ flexDirection: 'row' }}
+                key={Math.random().toString()}
+              >
                 {obj.map((cobj) => {
-                  // if (cobj === 'x')
-                  //   return (
-                  //     <View
-                  //       style={{
-                  //         width: 20,
-                  //         height: 20,
-                  //         backgroundColor: 'black',
-                  //       }}
-                  //     ></View>
-                  //   );
-                  if (cobj === '-')
+                  if (cobj === 0)
+                    return (
+                      <View
+                        style={{
+                          width: 40,
+                          height: 40,
+                          backgroundColor: 'gray',
+                        }}
+                        key={Math.random().toString()}
+                      ></View>
+                    );
+                  else if (cobj === 1)
                     return (
                       <View
                         style={{
@@ -523,9 +165,31 @@ const PathScreen = (props) => {
                           height: 40,
                           backgroundColor: 'white',
                         }}
+                        key={Math.random().toString()}
                       ></View>
                     );
-                  if (cobj === '+')
+                  else if (cobj === '-')
+                    return (
+                      <View
+                        style={{
+                          width: 40,
+                          height: 40,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                        key={Math.random().toString()}
+                      >
+                        <View
+                          style={{
+                            width: 20,
+                            height: 20,
+                            backgroundColor: 'green',
+                          }}
+                          key={Math.random().toString()}
+                        ></View>
+                      </View>
+                    );
+                  else if (cobj === 'start')
                     return (
                       <View
                         style={{
@@ -533,47 +197,78 @@ const PathScreen = (props) => {
                           height: 40,
                           backgroundColor: 'green',
                         }}
-                      ></View>
+                        key={Math.random().toString()}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 30,
+                            color: 'blue',
+                            textAlign: 'center',
+                          }}
+                        >
+                          O
+                        </Text>
+                      </View>
                     );
+                  else if (cobj === 'stop')
+                    return (
+                      <View
+                        style={{
+                          width: 40,
+                          height: 40,
+                          backgroundColor: 'green',
+                        }}
+                        key={Math.random().toString()}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 30,
+                            color: 'red',
+                            textAlign: 'center',
+                          }}
+                        >
+                          X
+                        </Text>
+                      </View>
+                    );
+                  else {
+                    return (
+                      <View
+                        style={{
+                          width: 40,
+                          height: 40,
+                          backgroundColor: 'gray',
+                        }}
+                        key={Math.random().toString()}
+                      >
+                        <Text style={{ fontSize: 12 }}>{cobj}</Text>
+                      </View>
+                    );
+                  }
                 })}
               </View>
             );
           })}
-          {/* {matr.map((obj) => {
-            if (obj.type === 'wall-horizontally')
-              return (
-                <View
-                  style={{
-                    width: 100 * obj.dimX,
-                    height: 20 * obj.dimY,
-                    borderWidth: 1,
-                    backgroundColor: 'black',
-                    borderColor: 'black',
-                  }}
-                >
-                  <Text>{obj.name}</Text>
-                </View>
-              );
-          })} */}
         </ScrollView>
       </ScrollView>
     );
   };
+
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <View>{/* <RenderMap /> */}</View>
+        <View>{<RenderMap />}</View>
       </View>
       <View style={styles.footer}>
         <View style={styles.footerTitleContainer}>
           <View style={styles.footerTitleElement}>
             <Text style={styles.footerTitleText}>
-              Items in cart: {noItems}/{Object.values(items).length}
+              Items in cart: {itemsInCart}/{Object.values(items).length}
             </Text>
           </View>
           <View>
             <Text style={styles.footerTitleText}>
-              Total Amount: {cartAmount.toFixed(2)}$
+              Total Amount: {totalAmount.toFixed(2)}$
             </Text>
           </View>
         </View>

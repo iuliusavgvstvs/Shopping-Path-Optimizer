@@ -1,8 +1,7 @@
 (function (definition) {
-  /* global module, define */
-  if (typeof module === "object" && typeof module.exports === "object") {
+  if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = definition();
-  } else if (typeof define === "function" && define.amd) {
+  } else if (typeof define === 'function' && define.amd) {
     define([], definition);
   } else {
     var exports = definition();
@@ -27,17 +26,6 @@
   }
 
   var astar = {
-    /**
-  * Perform an A* Search on a graph given a start and end node.
-  * @param {Graph} graph
-  * @param {GridNode} start
-  * @param {GridNode} end
-  * @param {Object} [options]
-  * @param {bool} [options.closest] Specifies whether to return the
-             path to the closest node if the target is unreachable.
-  * @param {Function} [options.heuristic] Heuristic function (see
-  *          astar.heuristics).
-  */
     search: function (graph, start, end, options) {
       graph.cleanDirty();
       options = options || {};
@@ -117,7 +105,6 @@
       // No result was found - empty array signifies failure to find path.
       return [];
     },
-    // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
     heuristics: {
       manhattan: function (pos0, pos1) {
         var d1 = Math.abs(pos1.x - pos0.x);
@@ -144,9 +131,6 @@
 
   /**
    * A graph memory structure
-   * @param {Array} gridIn 2D array of input weights
-   * @param {Object} [options]
-   * @param {bool} [options.diagonal] Specifies whether diagonal moves are allowed
    */
   function Graph(gridIn, options) {
     options = options || {};
@@ -243,9 +227,9 @@
       for (var y = 0; y < row.length; y++) {
         rowDebug.push(row[y].weight);
       }
-      graphString.push(rowDebug.join(" "));
+      graphString.push(rowDebug.join(' '));
     }
-    return graphString.join("\n");
+    return graphString.join('\n');
   };
 
   function GridNode(x, y, weight) {
@@ -255,7 +239,7 @@
   }
 
   GridNode.prototype.toString = function () {
-    return "[" + this.x + " " + this.y + "]";
+    return '[' + this.x + ' ' + this.y + ']';
   };
 
   GridNode.prototype.getCost = function (fromNeighbor) {

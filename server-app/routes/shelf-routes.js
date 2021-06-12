@@ -23,6 +23,20 @@ router.post(
 );
 
 router.post(
+  '/generatepath',
+  [
+    check('allshelves').notEmpty(),
+    check('dimX').notEmpty(),
+    check('dimY').notEmpty(),
+    check('startX').notEmpty(),
+    check('startY').notEmpty(),
+    check('endX').notEmpty(),
+    check('endY').notEmpty(),
+  ],
+  shelfControllers.generateNext
+);
+
+router.post(
   '/getshelvesconfiguration',
   [check('shelves').notEmpty()],
   shelfControllers.getShelvesConfiguration

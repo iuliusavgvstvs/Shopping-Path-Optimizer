@@ -107,7 +107,9 @@ const ProductsScreen = (props) => {
     } else {
       Alert.alert(
         'Are you sure?',
-        `Do you want to generate the path for the current items?  The total amount is ${totalAmount}`,
+        `Do you want to generate the path for the current items?  The total amount is ${totalAmount.toFixed(
+          2
+        )}`,
         [
           { text: 'No', style: 'cancel' },
           {
@@ -273,6 +275,7 @@ const ProductsScreen = (props) => {
             imageUrl={itemData.item.productImageUrl}
             quantity={itemData.item.quantity}
             price={itemData.item.sum}
+            checkout="false"
             addHandler={() =>
               addHandler(
                 itemData.item.productId,

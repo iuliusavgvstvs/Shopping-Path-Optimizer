@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { Button } from 'react-native-elements';
+import { Ionicons } from '@expo/vector-icons';
 
 const ProductItem = (props) => {
   return (
@@ -19,17 +20,44 @@ const ProductItem = (props) => {
       <View style={styles.priceContainer}>
         <Text style={styles.price}>{props.price}$</Text>
       </View>
-      <View style={styles.buttonContainer}>
-        <View style={styles.button}>
-          <Button title="-" type="clear" onPress={props.removeHandler} />
+      {props.checkout === 'false' ? (
+        <View style={styles.buttonContainer}>
+          <View style={styles.button}>
+            <Button title="-" type="clear" onPress={props.removeHandler} />
+          </View>
+          <View style={styles.button}>
+            <Text style={styles.quantity}>{props.quantity}</Text>
+          </View>
+          <View style={styles.button}>
+            <Button title="+" type="clear" onPress={props.addHandler} />
+          </View>
         </View>
-        <View style={styles.button}>
-          <Text style={styles.quantity}>{props.quantity}</Text>
+      ) : (
+        <View
+          style={
+            ({ ...styles.buttonContainer },
+            {
+              flex: 3,
+              alignItems: 'center',
+              flexDirection: 'row',
+            })
+          }
+        >
+          <View style={styles.button}>
+            <Text style={styles.quantity}>{props.quantity}</Text>
+          </View>
+          <View style={styles.button}>
+            <Button
+              icon={
+                <Ionicons name="checkmark-circle" size={22} color="black" />
+              }
+              title="Ok"
+              type="clear"
+              onPress={props.checkHandler}
+            />
+          </View>
         </View>
-        <View style={styles.button}>
-          <Button title="+" type="clear" onPress={props.addHandler} />
-        </View>
-      </View>
+      )}
     </View>
   );
 };
