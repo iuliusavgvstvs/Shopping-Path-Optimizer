@@ -9,7 +9,7 @@ export const LOGIN_FAILED = 'LOGIN_FAILED';
 export const CLEAR_ERROR = 'CLEAR_ERROR';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.1.100:5000/api',
+  baseURL: 'http://192.168.1.102:5000/api',
   headers: { 'Content-Type': 'application/json' },
   timeout: 10000,
 });
@@ -24,7 +24,7 @@ export const signup = (email, password) => {
         data: { email, password },
       });
       const responseData = response.data;
-      dispatch({ type: SIGNUP_SUCCEEDED, payload: response });
+      dispatch({ type: SIGNUP_SUCCEEDED, payload: responseData });
     } catch (error) {
       let err = 'Sign up failed. Please try again later.';
       if (!error.response)

@@ -6,7 +6,7 @@ export const FETCH_CATEGORY_SUCCEEDED = 'FETCH_CATEGORY_SUCCEEDED';
 export const CLEAR_CATEGORY_ERROR = 'CLEAR_CATEGORY_ERROR';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.1.100:5000/api',
+  baseURL: 'http://192.168.1.102:5000/api',
   headers: { 'Content-Type': 'application/json' },
   timeout: 10000,
 });

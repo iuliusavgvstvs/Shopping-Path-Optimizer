@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {
   VALIDATOR_EMAIL,

@@ -54,6 +54,12 @@ export default (state = initialState, action) => {
         error: null,
         isLoadingPath: false,
       };
+    case INIT_PATH_FAILED:
+      return {
+        ...state,
+        isLoadingPath: false,
+        error: action.payload.error,
+      };
     case CHECK_ITEM:
       const oldItem = state.itemsToPick.find(
         (item) => item.productId === action.payload.itemId
@@ -72,6 +78,12 @@ export default (state = initialState, action) => {
         ...state,
         isLoadingPath: true,
       };
+    case GENERATE_NEXT_FAILED:
+      return {
+        ...state,
+        error: action.payload.error,
+      };
+
     case GENERATE_NEXT_SUCCEEDED: {
       let newItemsToPick = [];
       if (state.currentShelf < state.currentShelves.length - 1) {

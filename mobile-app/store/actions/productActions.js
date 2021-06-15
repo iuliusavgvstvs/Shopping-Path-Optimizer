@@ -6,7 +6,7 @@ export const FETCH_PRODUCTS_FAILED = 'FETCH_PRODUCTS_FAILED';
 export const CLEAR_PRODUCTS_ERROR = 'CLEAR_PRODUCTS_ERROR';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.1.100:5000/api',
+  baseURL: 'http://192.168.1.102:5000/api',
   headers: { 'Content-Type': 'application/json' },
   timeout: 10000,
 });

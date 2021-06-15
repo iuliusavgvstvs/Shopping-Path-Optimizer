@@ -103,7 +103,7 @@ const generateNext = async (req, res, next) => {
     if (parseInt(endX) + 1 < dimX) {
       end = graph.grid[parseInt(endX) + 1][parseInt(endY) - 1];
     } else {
-      end = graph.grid[parseInt(endX)][parseInt(endY) - 1];
+      end = graph.grid[parseInt(endX)][parseInt(endY)];
     }
 
     var path = astar.search(graph, start, end);

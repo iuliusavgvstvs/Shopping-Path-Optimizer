@@ -9,7 +9,7 @@ export const GENERATE_NEXT_SUCCEEDED = 'GENERATE_NEXT_SUCCEEDED';
 export const GENERATE_NEXT_FAILED = 'GENERATE_NEXT_FAILED';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.1.100:5000/api',
+  baseURL: 'http://192.168.1.102:5000/api',
   headers: { 'Content-Type': 'application/json' },
   timeout: 10000,
 });

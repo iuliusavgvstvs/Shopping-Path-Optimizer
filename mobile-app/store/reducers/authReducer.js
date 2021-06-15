@@ -70,7 +70,7 @@ export default (state = initialState, action) => {
         token: null,
         userId: null,
         userEmail: null,
-        error: action.payload.error,
+        error: action.payload,
       };
     case CLEAR_ERROR:
       return { ...state, error: null };
