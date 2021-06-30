@@ -6,6 +6,7 @@ const usersRoutes = require('./routes/users-routes');
 const categoriesRoutes = require('./routes/categories-routes');
 const productsRoutes = require('./routes/products-routes');
 const shelfRoutes = require('./routes/shelf-routes');
+const cartRoutes = require('./routes/cart-routes');
 const configRoutes = require('./routes/shop-config-routes');
 const HttpError = require('./models/http-error');
 
@@ -20,11 +21,13 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/shelf', shelfRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/cart', cartRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError('Could not find this route', 404);
   throw error;
 });
+
 app.use((error, req, res, next) => {
   if (res.headerSent) {
     return next(error);

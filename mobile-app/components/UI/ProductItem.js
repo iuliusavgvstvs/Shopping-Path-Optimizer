@@ -18,7 +18,7 @@ const ProductItem = (props) => {
         <Text style={styles.title}>{props.title}</Text>
       </View>
       <View style={styles.priceContainer}>
-        <Text style={styles.price}>{props.price}$</Text>
+        <Text style={styles.price}>{props.price.toFixed(2)}$</Text>
       </View>
       {props.checkout === 'false' ? (
         <View style={styles.buttonContainer}>

@@ -105,7 +105,9 @@ const PathScreen = (props) => {
           <Button
             title="Finish"
             onPress={() => {
-              Alert.alert('Felicitari!', 'Ati terminat.', [{ text: 'Ok' }]);
+              Alert.alert('Congratulations!', 'You finished.', [
+                { text: 'Ok' },
+              ]);
               props.navigation.navigate('Products');
             }}
           />
@@ -253,6 +255,10 @@ const PathScreen = (props) => {
       </ScrollView>
     );
   };
+  let len = 0;
+  if (items) {
+    len = Object.values(items).length;
+  }
 
   return (
     <View style={styles.screen}>
@@ -263,7 +269,7 @@ const PathScreen = (props) => {
         <View style={styles.footerTitleContainer}>
           <View style={styles.footerTitleElement}>
             <Text style={styles.footerTitleText}>
-              Items in cart: {itemsInCart}/{Object.values(items).length}
+              Items in cart: {itemsInCart}/{len}
             </Text>
           </View>
           <View>
